@@ -34,6 +34,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B56332CB29EBDA8E00F2477F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		B56332CC29EBDA8E00F2477F /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		B571A9CA29EBBC4C00EF96F7 /* bijutsukan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = bijutsukan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B571A9CD29EBBC4C00EF96F7 /* bijutsukanApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = bijutsukanApp.swift; sourceTree = "<group>"; };
 		B571A9CF29EBBC4C00EF96F7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -75,6 +77,8 @@
 		B571A9C129EBBC4C00EF96F7 = {
 			isa = PBXGroup;
 			children = (
+				B56332CC29EBDA8E00F2477F /* LICENSE */,
+				B56332CB29EBDA8E00F2477F /* README.md */,
 				B571A9CC29EBBC4C00EF96F7 /* bijutsukan */,
 				B571A9DE29EBBC4F00EF96F7 /* bijutsukanTests */,
 				B571A9E829EBBC4F00EF96F7 /* bijutsukanUITests */,
