@@ -11,7 +11,11 @@ import SwiftUI
 struct bijutsukanApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationSplitView {
+                BooruListView()
+            } detail: {
+                EmptyView()
+            }
         }
     }
 }
