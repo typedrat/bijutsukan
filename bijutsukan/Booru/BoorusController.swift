@@ -16,11 +16,12 @@ final class BoorusController: ObservableObject {
         self._boorus = Stored(in: store)
     }
     
-    func saveBooru(booru: Booru) async throws {
+    func saveBooru(booru: Booru) async throws {       
         try await self.$boorus.insert(booru)
     }
     
     func removeBooru(booru: Booru) async throws {
+        booru.removeFromKeychain()
         try await self.$boorus.remove(booru)
     }
     

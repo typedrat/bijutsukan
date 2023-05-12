@@ -9,10 +9,14 @@ import SwiftUI
 
 @main
 struct bijutsukanApp: App {
+    @State private var columnVisibility = NavigationSplitViewVisibility.all
+    
     var body: some Scene {
         WindowGroup {
-            NavigationSplitView {
-                BooruListView()
+            NavigationSplitView(columnVisibility: $columnVisibility) {
+                BooruListView() { booru in
+                    Text(booru.name)
+                }
             } detail: {
                 EmptyView()
             }

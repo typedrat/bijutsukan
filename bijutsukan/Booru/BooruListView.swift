@@ -2,9 +2,13 @@ import SwiftUI
 import Boutique
 import NukeUI
 
-struct BooruListView: View {
+struct BooruListView<Children: View>: View {
     @StateObject var boorusController: BoorusController = BoorusController()
+    @ViewBuilder var destinationView: (_ booru: Booru) -> Children
     @State private var booruFavicons: [UUID: URL] = [:]
+    
+    @State private var showConfirmationDialog = false
+    @State private var confirmationDialogForBooru: Booru?
     
     @State private var showEditor: Bool = false
     @State private var shouldSaveBooru: Bool = false
@@ -25,56 +29,92 @@ struct BooruListView: View {
                         } else {
                             EmptyView()
                         }
-                    }.frame(width: maxRowHeight * 0.8, height: maxRowHeight * 0.8)
+                    }
+                        .frame(width: maxRowHeight * 0.8, height: maxRowHeight * 0.8)
                         .task {
                             booruFavicons[booru.id] = await booru.getFavicon()
                         }
                     
                     NavigationLink(booru.name) {
-                        Text("foo")
+                        destinationView(booru)
                     }
                 }
                 .swipeActions(allowsFullSwipe: false) {
                     Button(role: .destructive) {
-                        Task {
-                            try await boorusController.removeBooru(booru: booru)
-                        }
+                        confirmDeletion(for: booru)
                     } label: {
                         Label("Delete", systemImage: "trash.fill")
                     }
                     
                     Button {
-                        editingBooru = booru
-                        showEditor = true
+                        openEditor(for: booru)
                     } label: {
                         Label("Edit", systemImage: "pencil")
                     }
                     .tint(.blue)
                 }
+                .contextMenu {
+                    Button("Edit Server") {
+                        openEditor(for: booru)
+                    }
+
+                    Button("Delete Server", role: .destructive) {
+                        confirmDeletion(for: booru)
+                    }
+                }
             }
         }
         .navigationTitle("Servers")
+#if !os(macOS)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    editingBooru = Booru()
-                    showEditor = true
-                } label: {
-                    Image(systemName: "plus")
-                }
+            Button(action: openEditor) {
+                Image(systemName: "plus")
             }
-            
         }
+#endif
         .sheet(isPresented: $showEditor, onDismiss: editorDismissed) {
             BooruEditorView(booru: $editingBooru, shouldSaveBooru: $shouldSaveBooru)
         }
+        .confirmationDialog("Are you sure?",
+                            isPresented: $showConfirmationDialog,
+                            presenting: confirmationDialogForBooru) { booru in
+            Button("Delete", role: .destructive) {
+                Task {
+                    try await boorusController.removeBooru(booru: booru)
+                }
+            }
+        } message: { booru in
+            Text("The configured settings for \(booru.name) and all associated favorites will be lost!")
+                .foregroundColor(Color.secondary)
+        }
+        
+#if os(macOS)
+        VStack {
+            Spacer()
+            HStack {
+                Button(action: openEditor) {
+                    Label("Add Server", systemImage: "plus.circle")
+                }
+                    .padding()
+                    .buttonStyle(.borderless)
+                Spacer()
+            }
+        }
+#endif
+    }
+    
+    private func openEditor(for booru: Booru) {
+        editingBooru = booru
+        showEditor = true
+    }
+    
+    private func openEditor() {
+        openEditor(for: Booru())
     }
     
     private func editorDismissed() {
         Task {
             if shouldSaveBooru {
-                print("new booru:", editingBooru as Any)
-                
                 do {
                     var booruToSave = editingBooru
                     await booruToSave.autodetectType()
@@ -86,6 +126,11 @@ struct BooruListView: View {
             
             editingBooru = Booru()
         }
+    }
+    
+    private func confirmDeletion(for booru: Booru) {
+        showConfirmationDialog = true
+        confirmationDialogForBooru = booru
     }
 }
 
@@ -111,7 +156,9 @@ struct BooruListView_Previews: PreviewProvider {
                           password: ""
                          )
                 ], cacheIdentifier: \.id.uuidString)
-            ))
+            )) { booru in
+                Text(booru.name)
+            }
         }
     }
 }

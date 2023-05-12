@@ -13,6 +13,29 @@ struct BooruEditorView: View {
         
         NavigationStack {
             Form {
+#if os(macOS)
+                TextField("Name", text: $booru.name)
+                
+                Picker("Server Type", selection: $booru.booruType) {
+                    ForEach(BooruType.allCases) { type in
+                        Text(type.displayName)
+                    }
+                }
+                
+                TextField("URL", text: urlBinding)
+                    .disableAutocorrection(true)
+                
+                Toggle(isOn: $booru.onlySafeContent) {
+                    Text("Enable Rating Filter")
+                }
+                
+                TextField("Username", text: $booru.username)
+                    .textContentType(.username)
+                    .disableAutocorrection(true)
+                SecureField("Password", text: $booru.password)
+                    .textContentType(.password)
+                    .disableAutocorrection(true)
+#else
                 Section("Server Information") {
                     TextField("Name", text: $booru.name)
                     
@@ -21,7 +44,7 @@ struct BooruEditorView: View {
                             Text(type.displayName)
                         }
                     }
-
+                    
                     TextField("URL", text: urlBinding)
                         .keyboardType(.URL)
                         .textContentType(.URL)
@@ -43,9 +66,12 @@ struct BooruEditorView: View {
                         .disableAutocorrection(true)
                         .autocapitalization(.none)
                 }
+#endif
             }
             .navigationTitle("Add Server")
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+#endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) {
@@ -61,6 +87,7 @@ struct BooruEditorView: View {
                     }
                 }
             }
+            .padding()
         }
     }
 }

@@ -40,7 +40,7 @@ struct Booru: Codable, Equatable, Identifiable {
     
     init() {
         self.id = UUID()
-        self.name = ""
+        self.name = "New Server"
         self.baseUrl = nil
         self.booruType = .autodetect
         self.onlySafeContent = true
@@ -111,6 +111,16 @@ struct Booru: Codable, Equatable, Identifiable {
         try container.encode(self.onlySafeContent, forKey: Booru.CodingKeys.onlySafeContent)
         try container.encode(self.username, forKey: Booru.CodingKeys.username)
         
+        if let url = self.baseUrl {
+            let keychain = Keychain(server: url, protocolType: .https)
+                .accessibility(.afterFirstUnlock)
+                .synchronizable(true)
+            
+            keychain[self.username] = self.password
+        }
+    }
+    
+    func removeFromKeychain() {
         if let url = self.baseUrl {
             let keychain = Keychain(server: url, protocolType: .https)
                 .accessibility(.afterFirstUnlock)
